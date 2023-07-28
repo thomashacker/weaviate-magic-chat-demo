@@ -209,7 +209,7 @@ mode_descriptions = {
 with st.expander("Build with Weaviate for the Streamlit Hackathon 2023"):
     st.write(
         """This project is a submission for the Streamlit Connections Hackathon 2023.
-It delivers a Streamlit connector for the open-source vector database, Weaviate. Magic Chat is using the Weaviate connector to search through Magic The Gathering cards with various search options, such as BM25, Semantic Search, Hybrid Search and Generative Search. Yoiu can visit the repo here https://github.com/weaviate/st-weaviate-connection/tree/main"""
+It delivers a Streamlit connector for the open-source vector database, Weaviate. Magic Chat is using the Weaviate connector to search through Magic The Gathering cards with various search options, such as BM25, Semantic Search, Hybrid Search and Generative Search. You can visit the repo here https://github.com/weaviate/st-weaviate-connection/tree/main"""
     )
 
 # User Configuration
