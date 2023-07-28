@@ -37,6 +37,12 @@ def display_chat_messages() -> None:
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
+            if "images" in message:
+                for i in range(0, len(message["images"]), NUM_IMAGES_PER_ROW):
+                    cols = st.columns(NUM_IMAGES_PER_ROW)
+                    for j in range(NUM_IMAGES_PER_ROW):
+                        if i + j < len(message["images"]):
+                            cols[j].image(message["images"][i + j], width=200)
 
 
 # Environment variables
@@ -237,14 +243,30 @@ if not st.session_state.greetings:
         st.session_state.messages.append({"role": "assistant", "content": intro})
         st.session_state.greetings = True
 
-# Wait for prompt
-if prompt := st.chat_input("What cards are you looking for?"):
+# Example prompts
+example_prompts = [
+    "You gain Life, Enemy loses Life",
+    "Vampires for white deck",
+    "Mythic cat",
+]
+
+button_cols = st.columns(3)
+button_pressed = ""
+if button_cols[0].button(example_prompts[0]):
+    button_pressed = example_prompts[0]
+elif button_cols[1].button(example_prompts[1]):
+    button_pressed = example_prompts[1]
+elif button_cols[2].button(example_prompts[2]):
+    button_pressed = example_prompts[2]
+
+if prompt := (st.chat_input("What cards are you looking for?") or button_pressed):
     # Display user message in chat message container
     with st.chat_message("user"):
         st.markdown(prompt)
     # Add user message to chat history
     st.session_state.messages.append({"role": "user", "content": prompt})
 
+    images = []
     if prompt != "":
         query = prompt.strip().lower()
         gql = mode_descriptions[mode][1].format(input=query, limit_card=limit)
@@ -277,5 +299,12 @@ if prompt := st.chat_input("What cards are you looking for?"):
                 if row["img"]:
                     # Display image in the column
                     cols[index % NUM_IMAGES_PER_ROW].image(row["img"], width=200)
+                    images.append(row["img"])
+                else:
+                    cols[index % NUM_IMAGES_PER_ROW].write(
+                        f"No Image Available for: {row['type']}"
+                    )
 
-            st.session_state.messages.append({"role": "assistant", "content": response})
+            st.session_state.messages.append(
+                {"role": "assistant", "content": response, "images": images}
+            )
