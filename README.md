@@ -1,0 +1,1 @@
+# weaviate-magic-chat-demo
