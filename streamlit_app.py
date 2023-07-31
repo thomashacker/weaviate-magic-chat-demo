@@ -58,10 +58,6 @@ if url == "" or api_key == "" or openai_key == "":
 
 # Title
 st.title("🔮 Magic Chat")
-st.subheader("The Generative Gathering")
-st.write(
-    "Chat with Magic Chat that utilizes traditional BM25, Semantic, Hybrid, and Generative Search to build your dream deck for Magic The Gathering."
-)
 
 # Connection to Weaviate thorugh Connector
 conn = st.experimental_connection(
@@ -72,7 +68,16 @@ conn = st.experimental_connection(
     additional_headers={"X-OpenAI-Api-Key": openai_key},
 )
 
-st.success("Connected to Weaviate client", icon="💚")
+with st.sidebar:
+    st.subheader("The Generative Gathering")
+    st.markdown(
+        """Magic Chat is a chatbot built with [Streamlit](https://streamlit.io/) and [Weaviate](https://weaviate.io/) to search for [Magic the Gathering](https://magic.wizards.com/en) cards. 
+        It offers multiple search options such as traditional BM25, Semantic, Hybrid, and Generative Search to find cards for your dream deck. 
+        Whether you're looking for blue cards to nullify spells, black cards to create an undead army, or just want to find new cool cards! 
+        Our Weaviate database contains 27k cards from the [Scryfall API](https://scryfall.com/) ready for you to be discovered."""
+    )
+    st.header("Settings")
+    st.success("Connected to Weaviate client", icon="💚")
 
 # Search Mode descriptions
 
@@ -196,35 +201,144 @@ mode_descriptions = {
     "BM25": [
         "BM25 is a method used by search engines to rank documents based on their relevance to a given query, factoring in both the frequency of keywords and the length of the document.",
         bm25_gql,
+        30,
     ],
     "Vector": [
         "Vector search is a method used by search engines to find and rank results based on their similarity to your search query. Instead of just matching keywords, it understands the context and meaning behind your search, offering more relevant and nuanced results.",
         vector_gql,
+        15,
     ],
     "Hybrid": [
         "Hybrid search combines vector and BM25 methods to offer better search results. It leverages the precision of BM25's keyword-based ranking with vector search's ability to understand context and semantic meaning. Providing results that are both directly relevant to the query and contextually related.",
         hybrid_gql,
+        15,
     ],
     "Generative": [
         "Generative search is an advanced method that combines information retrieval with AI language models. After finding relevant documents using search techniques like vector and BM25, the found information is used as an input to a language model, which generates further contextually related information.",
         generative_gql,
+        9,
     ],
 }
 
 # Information
-with st.expander("Build with Weaviate for the Streamlit Hackathon 2023"):
-    st.write(
-        """This project is a submission for the Streamlit Connections Hackathon 2023.
-It delivers a Streamlit connector for the open-source vector database, Weaviate. Magic Chat is using the Weaviate connector to search through Magic The Gathering cards with various search options, such as BM25, Semantic Search, Hybrid Search and Generative Search. You can visit the repo here https://github.com/weaviate/st-weaviate-connection/tree/main"""
+with st.expander("Built with Weaviate for the Streamlit Hackathon 2023"):
+    st.subheader("Streamlit Hackathon 2023")
+    st.markdown(
+        """
+        This project is a submission for the [Streamlit Connections Hackathon 2023](https://discuss.streamlit.io/t/connections-hackathon/47574).
+        It delivers a Streamlit connector for the open-source vector database, [Weaviate](https://weaviate.io/). 
+        Magic Chat is using the Weaviate connector to search through [Magic The Gathering](https://magic.wizards.com/en) cards with various search options, such as BM25, Semantic Search, Hybrid Search and Generative Search. 
+        You can find the submission in this [GitHub repo](https://github.com/weaviate/st-weaviate-connection/tree/main)
+        """
+    )
+    st.subheader("Data")
+    st.markdown(
+        """The database contains around 27k cards from the [Scryfall API](https://scryfall.com/). We used the following attributes to index the cards:
+- Name, Type, Keywords
+- Mana cost, Mana produced, Color
+- Power, Toughness, Rarity
+- Set name and Card description """
+    )
+    st.subheader("How it works")
+    st.markdown(
+        """The demo offers four search options with defined GraphQL queries:
+"""
+    )
+    st.image("./img/anim.gif")
+    st.divider()
+    st.markdown(
+        """The first is the **BM25 search**, 
+        it's a method used by search engines to rank documents based on their relevance to a given query, 
+        factoring in both the frequency of keywords and the length of the document. 
+        We can simply pass a query to the `query` parameter ([see docs](https://weaviate.io/developers/weaviate/search/bm25))"""
+    )
+    st.code(
+        """
+        {
+            Get {
+                Card(limit: {card_limit}, bm25: { query: "{query_input}" }) 
+                {
+                    ...
+                }
+            }
+        }""",
+        language="graphql",
+    )
+    st.markdown(
+        """The second option is **Vector search**, a method used to find and rank results based on their similarity to a given search query. 
+        Instead of matching keywords, it understands the context and meaning behind the query, offering relevant and nuanced results. 
+        We use the `nearText` function in which we pass our query to the `concepts` parameter ([see docs](https://weaviate.io/developers/weaviate/api/graphql/search-operators#neartext))"""
+    )
+    st.code(
+        """
+        {
+            Get {
+                Card(limit: {card_limit}, nearText: { concepts: ["{query_input}"] }) 
+                {
+                    ...
+                }
+            }
+        }""",
+        language="graphql",
+    )
+    st.markdown(
+        """With **Hybrid search** we combine both methods and use a ranking alogrithm to combine their results. 
+        It leverages the precision of BM25's keyword-based ranking with vector search's ability to understand context and semantic meaning. 
+        We can pass our query to the `query` parameter and set the `alpha` that determines the weighting for each search ([see docs](https://weaviate.io/developers/weaviate/api/graphql/search-operators#hybrid))"""
+    )
+    st.code(
+        """
+        {
+            Get {
+                Card(limit: {card_limit}, hybrid: { query: "{input}" alpha:0.5 }) 
+                {
+                    ...
+                }
+            }
+        }""",
+        language="graphql",
+    )
+    st.markdown(
+        """The last option is **Generative search** which is an advanced method that combines information retrieval with AI language models. 
+        In our configuration, it retrieves results with **Hybrid search** and passes them to a `gpt-3.5-turbo model` to determine the best Magic card based on the user query. 
+        We use the `generate` module and `groupedResult` task which uses the data of the result as context for the given prompt and query. ([see docs](https://weaviate.io/developers/weaviate/modules/reader-generator-modules/generative-openai))"""
+    )
+    st.code(
+        """
+        {
+            Get {
+                Card(limit: {card_limit}, hybrid: { query: "{input}" alpha:0.5 }) 
+                {
+                    _additional {
+                        generate(
+                            groupedResult: {
+                                task: "Based on the Magic The Gathering Cards, which one would you recommend and why. Use the context of the user query: {input}"
+                            }
+                        ) {
+                        groupedResult
+                        error
+                        }
+                    }
+                }
+            }
+        }""",
+        language="graphql",
     )
 
-# User Configuration
-desc_col, mode_col = st.columns([0.8, 0.2])
-mode = mode_col.radio(
-    "Search Mode", options=["BM25", "Vector", "Hybrid", "Generative"], index=3
-)
-desc_col.info(mode_descriptions[mode][0])
-limit = st.slider(label="Number of cards", min_value=1, max_value=12, value=6)
+# User Configuration Sidebar
+with st.sidebar:
+    mode = st.radio(
+        "Search Mode", options=["BM25", "Vector", "Hybrid", "Generative"], index=3
+    )
+    limit = st.slider(
+        label="Number of cards",
+        min_value=1,
+        max_value=mode_descriptions[mode][2],
+        value=6,
+    )
+    st.info(mode_descriptions[mode][0])
+
+st.divider()
 
 # Initialize chat history
 if "messages" not in st.session_state:
@@ -245,9 +359,9 @@ if not st.session_state.greetings:
 
 # Example prompts
 example_prompts = [
-    "You gain Life, Enemy loses Life",
-    "Vampires for white deck",
-    "Mythic cat",
+    "You gain life and enemy loses life",
+    "Vampires for black deck with flying",
+    "Blue and green sorcery cards",
 ]
 
 button_cols = st.columns(3)
@@ -271,7 +385,7 @@ if prompt := (st.chat_input("What cards are you looking for?") or button_pressed
         query = prompt.strip().lower()
         gql = mode_descriptions[mode][1].format(input=query, limit_card=limit)
 
-        df = conn.query(gql)
+        df = conn.query(gql, ttl=None)
 
         response = ""
         with st.chat_message("assistant"):
@@ -286,7 +400,7 @@ if prompt := (st.chat_input("What cards are you looking for?") or button_pressed
                     full_response = ""
                     for chunk in first_response.split():
                         full_response += chunk + " "
-                        time.sleep(0.05)
+                        time.sleep(0.02)
                         # Add a blinking cursor to simulate typing
                         message_placeholder.markdown(full_response + "▌")
                     message_placeholder.markdown(full_response)
@@ -308,3 +422,4 @@ if prompt := (st.chat_input("What cards are you looking for?") or button_pressed
             st.session_state.messages.append(
                 {"role": "assistant", "content": response, "images": images}
             )
+            st.experimental_rerun()
