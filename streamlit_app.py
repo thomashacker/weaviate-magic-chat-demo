@@ -166,7 +166,7 @@ hybrid_gql = """
 generative_gql = """
         {{
             Get {{
-                Card(limit: {limit_card}, hybrid: {{ query: "{input}" alpha:0.5 }}) 
+                Card(limit: {limit_card}, nearText: {{ concepts: ["{input}"] }})
                 {{
                     name
                     card_id
@@ -301,14 +301,14 @@ with st.expander("Built with Weaviate for the Streamlit Hackathon 2023"):
     )
     st.markdown(
         """The last option is **Generative search** which is an advanced method that combines information retrieval with AI language models. 
-        In our configuration, it retrieves results with **Hybrid search** and passes them to a `gpt-3.5-turbo model` to determine the best Magic card based on the user query. For this, we rely on its knowledge about Magic The Gathering, but this model could be easily exchanged. 
+        In our configuration, it retrieves results with a **Vector search** and passes them to a `gpt-3.5-turbo model` to determine the best Magic card based on the user query. For this, we rely on its knowledge about Magic The Gathering, but this model could be easily exchanged. 
         We use the `generate` module and `groupedResult` task which uses the data of the result as context for the given prompt and query. ([see docs](https://weaviate.io/developers/weaviate/modules/reader-generator-modules/generative-openai))"""
     )
     st.code(
         """
         {
             Get {
-                Card(limit: {card_limit}, hybrid: { query: "Vampires with flying ability" alpha:0.5 }) 
+                Card(limit: {card_limit}, nearText: { concepts: ["Vampires with flying ability"] }) 
                 {
                     _additional {
                         generate(
@@ -372,7 +372,7 @@ if not st.session_state.greetings:
 # Example prompts
 example_prompts = [
     "You gain life and enemy loses life",
-    "Vampires for black deck with flying ability",
+    "Vampires cards with flying ability",
     "Blue and green colored sorcery cards",
     "White card with protection from black",
     "The famous 'Black Lotus' card",
