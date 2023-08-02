@@ -415,6 +415,8 @@ if prompt := (st.chat_input("What cards are you looking for?") or button_pressed
     # Add user message to chat history
     st.session_state.messages.append({"role": "user", "content": prompt})
 
+    prompt = prompt.replace('"', "").replace("'", "")
+
     images = []
     if prompt != "":
         query = prompt.strip().lower()
