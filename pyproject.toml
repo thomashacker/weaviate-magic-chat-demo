@@ -9,7 +9,7 @@ packages = [{include = "st_weaviate_connection"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-weaviate-client = "^3.22.1"
+weaviate-client = "3.22.1"
 streamlit = "^1.25.0"
 python-dotenv = "^1.0.0"
 
