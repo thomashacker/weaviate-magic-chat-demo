@@ -61,7 +61,7 @@ if url == "" or api_key == "" or openai_key == "":
 st.title("🔮 Magic Chat")
 
 # Connection to Weaviate thorugh Connector
-conn = st.experimental_connection(
+conn = st.connection(
     "weaviate",
     type=WeaviateConnection,
     url=os.getenv("WEAVIATE_URL"),
