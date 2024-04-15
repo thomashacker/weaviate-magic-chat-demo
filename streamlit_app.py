@@ -6,8 +6,10 @@ import os
 
 from dotenv import load_dotenv
 
+load_dotenv()
+
 # Constants
-ENV_VARS = ["WEAVIATE_URL", "WEAVIATE_API_KEY", "OPENAI_API_KEY"]
+ENV_VARS = ["WEAVIATE_URL", "WEAVIATE_API_KEY", "OPENAI_KEY"]
 NUM_IMAGES_PER_ROW = 3
 
 
@@ -17,7 +19,6 @@ def get_env_vars(env_vars: list) -> dict:
     @parameter env_vars : list - List containing keys of environment variables
     @returns dict - A dictionary of environment variables
     """
-    load_dotenv()
 
     env_vars = {}
     for var in ENV_VARS:
@@ -49,7 +50,7 @@ def display_chat_messages() -> None:
 env_vars = get_env_vars(ENV_VARS)
 url = env_vars["WEAVIATE_URL"]
 api_key = env_vars["WEAVIATE_API_KEY"]
-openai_key = env_vars["OPENAI_API_KEY"]
+openai_key = env_vars["OPENAI_KEY"]
 
 # Check keys
 if url == "" or api_key == "" or openai_key == "":
@@ -85,7 +86,7 @@ with st.sidebar:
 bm25_gql = """
         {{
             Get {{
-                Card(limit: {limit_card}, bm25: {{ query: "{input}" }}) 
+                MagicChat_Card(limit: {limit_card}, bm25: {{ query: "{input}" }}) 
                 {{
                     name
                     card_id
@@ -112,7 +113,7 @@ bm25_gql = """
 vector_gql = """
         {{
             Get {{
-                Card(limit: {limit_card}, nearText: {{ concepts: ["{input}"] }}) 
+                MagicChat_Card(limit: {limit_card}, nearText: {{ concepts: ["{input}"] }}) 
                 {{
                     name
                     card_id
@@ -139,7 +140,7 @@ vector_gql = """
 hybrid_gql = """
         {{
             Get {{
-                Card(limit: {limit_card}, hybrid: {{ query: "{input}" alpha:0.5 }}) 
+                MagicChat_Card(limit: {limit_card}, hybrid: {{ query: "{input}" alpha:0.5 }}) 
                 {{
                     name
                     card_id
@@ -166,7 +167,7 @@ hybrid_gql = """
 generative_gql = """
         {{
             Get {{
-                Card(limit: {limit_card}, nearText: {{ concepts: ["{input}"] }})
+                MagicChat_Card(limit: {limit_card}, nearText: {{ concepts: ["{input}"] }})
                 {{
                     name
                     card_id
@@ -257,7 +258,7 @@ with st.expander("Built with Weaviate for the Streamlit Hackathon 2023"):
         """
         {
             Get {
-                Card(limit: {card_limit}, bm25: { query: "Vampires with flying ability" }) 
+                MagicChat_Card(limit: {card_limit}, bm25: { query: "Vampires with flying ability" }) 
                 {
                     ...
                 }
@@ -274,7 +275,7 @@ with st.expander("Built with Weaviate for the Streamlit Hackathon 2023"):
         """
         {
             Get {
-                Card(limit: {card_limit}, nearText: { concepts: ["Vampires with flying ability"] }) 
+                MagicChat_Card(limit: {card_limit}, nearText: { concepts: ["Vampires with flying ability"] }) 
                 {
                     ...
                 }
@@ -291,7 +292,7 @@ with st.expander("Built with Weaviate for the Streamlit Hackathon 2023"):
         """
         {
             Get {
-                Card(limit: {card_limit}, hybrid: { query: "Vampires with flying ability" alpha:0.5 }) 
+                MagicChat_Card(limit: {card_limit}, hybrid: { query: "Vampires with flying ability" alpha:0.5 }) 
                 {
                     ...
                 }
@@ -308,7 +309,7 @@ with st.expander("Built with Weaviate for the Streamlit Hackathon 2023"):
         """
         {
             Get {
-                Card(limit: {card_limit}, nearText: { concepts: ["Vampires with flying ability"] }) 
+                MagicChat_Card(limit: {card_limit}, nearText: { concepts: ["Vampires with flying ability"] }) 
                 {
                     _additional {
                         generate(

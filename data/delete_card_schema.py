@@ -31,12 +31,12 @@ def main() -> None:
 
     msg.good("Client connected to Weaviate Server")
 
-    if not client.schema.exists("Card"):
-        msg.warn(f"Card class does not exist")
+    if not client.schema.exists("MagicChat_Card"):
+        msg.warn(f"MagicChat_Card class does not exist")
         return
     else:
-        client.schema.delete_class("Card")
-        msg.good(f"Card class deleted")
+        client.schema.delete_class("MagicChat_Card")
+        msg.good(f"MagicChat_Card class deleted")
 
 
 if __name__ == "__main__":

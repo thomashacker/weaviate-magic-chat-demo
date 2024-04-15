@@ -71,7 +71,7 @@ def add_card_to_weaviate(weaviate_obj: dict, client: weaviate.Client) -> None:
     """
     with client.batch as batch:
         batch.batch_size = 1
-        client.batch.add_data_object(weaviate_obj, "Card")
+        client.batch.add_data_object(weaviate_obj, "MagicChat_Card")
         msg.good(f"Imported {weaviate_obj['name']} to database")
 
 
@@ -80,7 +80,7 @@ def main() -> None:
 
     # Connect to Weaviate
     url = os.environ.get("WEAVIATE_URL", "")
-    openai_key = os.environ.get("OPENAI_API_KEY", "")
+    openai_key = os.environ.get("OPENAI_KEY", "")
     auth_config = weaviate.AuthApiKey(api_key=os.environ.get("WEAVIATE_API_KEY", ""))
 
     if openai_key == "" or url == "":
@@ -99,7 +99,7 @@ def main() -> None:
 
     query_results = (
         client.query.get(
-            "Card",
+            "MagicChat_Card",
             ["name"],
         )
         .with_limit(30000)
@@ -109,11 +109,11 @@ def main() -> None:
     unique_cards = set(
         [
             str(card["name"]).lower().strip()
-            for card in query_results["data"]["Get"]["Card"]
+            for card in query_results["data"]["Get"]["MagicChat_Card"]
         ]
     )
 
-    msg.info(f"Loaded {len(query_results['data']['Get']['Card'])} cards")
+    msg.info(f"Loaded {len(query_results['data']['Get']['MagicChat_Card'])} cards")
 
     with open("all_cards.json", "r") as reader:
         all_cards = json.load(reader)["data"]

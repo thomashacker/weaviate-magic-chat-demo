@@ -1,5 +1,5 @@
 {
-    "class": "Card",
+    "class": "MagicChat_Card",
     "description": "Magic the Gathering cards",
     "properties": [
         {

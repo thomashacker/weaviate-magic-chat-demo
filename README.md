@@ -49,7 +49,7 @@ Before you run the Jupyter notebook or the Streamlit app, create a `.env` file i
 ```
 WEAVIATE_URL= YOUR WEAVIATE_CLUSTER_URL
 WEAVIATE_API_KEY= YOUR WEAVIATE_API_KEY
-OPENAI_API_KEY= (ONLY NEEDED FOR STREAMLIT APP)
+OPENAI_KEY= (ONLY NEEDED FOR STREAMLIT APP)
 ```
 
 To set up your Weaviate cluster, follow either of these methods:

@@ -15,7 +15,7 @@ def main() -> None:
 
     # Connect to Weaviate
     url = os.environ.get("WEAVIATE_URL", "")
-    openai_key = os.environ.get("OPENAI_API_KEY", "")
+    openai_key = os.environ.get("OPENAI_KEY", "")
     auth_config = weaviate.AuthApiKey(api_key=os.environ.get("WEAVIATE_API_KEY", ""))
 
     if openai_key == "" or url == "":
@@ -32,14 +32,14 @@ def main() -> None:
 
     msg.good("Client connected to Weaviate Server")
 
-    if client.schema.exists("Card"):
-        msg.warn("Card class already exists")
+    if client.schema.exists("MagicChat_Card"):
+        msg.warn("MagicChat_Card class already exists")
         return
 
     with open("weaviate_schema.json", "r") as reader:
         class_obj = json.load(reader)
         client.schema.create_class(class_obj)
-        msg.good("Card class created")
+        msg.good("MagicChat_Card class created")
 
 
 if __name__ == "__main__":
